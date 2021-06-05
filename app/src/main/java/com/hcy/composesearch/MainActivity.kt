@@ -40,12 +40,14 @@ class MainActivity : ComponentActivity() {
             ComPoseSearchTheme {
                 // A surface container using the 'background' color from the theme
                 Surface(color = MaterialTheme.colors.background) {
-                    addSearch(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .wrapContentHeight()
-                    ) {
-                        Log.e("TAG", "DefaultPreview: do Search $it")
+                    Column() {
+                        addSearch(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .wrapContentHeight()
+                        ) {
+                            Log.e("TAG", "DefaultPreview: do Search $it")
+                        }
                     }
                 }
             }
@@ -104,7 +106,9 @@ fun addSearch(modifier: Modifier = Modifier, doSearch: (serchKey: String) -> Uni
                                 ))
                         }
                         BasicTextField(
-                            modifier=Modifier.fillMaxWidth().wrapContentHeight(),
+                            modifier= Modifier
+                                .fillMaxWidth()
+                                .wrapContentHeight(),
                             value = text,
                             onValueChange = {
                                 text = it
@@ -116,9 +120,6 @@ fun addSearch(modifier: Modifier = Modifier, doSearch: (serchKey: String) -> Uni
                             )
                         )
                     }
-
-
-
 
                     if (clearVisiable) {
                         Image(
@@ -158,7 +159,6 @@ fun addSearch(modifier: Modifier = Modifier, doSearch: (serchKey: String) -> Uni
                 )
             }
 
-
         }
     }
 
@@ -170,12 +170,17 @@ fun addSearch(modifier: Modifier = Modifier, doSearch: (serchKey: String) -> Uni
 fun DefaultPreview() {
     ComPoseSearchTheme {
 //        Greeting("Android")
-        addSearch(
-            modifier = Modifier
-                .fillMaxWidth()
-                .wrapContentHeight()
-        ) {
-            Log.e("TAG", "DefaultPreview: do Search $it")
+        Column() {
+            addSearch(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .wrapContentHeight()
+            ) {
+                Log.e("TAG", "DefaultPreview: do Search $it")
+            }
+
+
         }
+
     }
 }
