@@ -4,16 +4,20 @@ import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.viewModels
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
@@ -26,7 +30,12 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import com.hcy.composesearch.ui.theme.ComPoseSearchTheme
+import com.hcy.composesearch.ui.theme.MainViewMoudel
 
 
 /**
@@ -34,6 +43,9 @@ import com.hcy.composesearch.ui.theme.ComPoseSearchTheme
  * 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
  */
 class MainActivity : ComponentActivity() {
+    private val acMoudel by lazy {
+        viewModels<MainViewMoudel>().value
+    }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -47,13 +59,70 @@ class MainActivity : ComponentActivity() {
                                 .wrapContentHeight()
                         ) {
                             Log.e("TAG", "DefaultPreview: do Search $it")
+                            addItem(it)
                         }
+
+                        
                     }
                 }
             }
         }
     }
+
+
+    private fun addItem(it: String) {
+
+        acMoudel.addItem(it)
+
+    }
 }
+@Composable
+fun  addItem( acMoudle:MainViewMoudel){
+//        val datas = acMoudle.lvDatas.observeAsState(arrayListOf())
+//        LazyColumn() {
+//            items(datas)
+//
+//        }
+}
+
+
+//class HelloViewModel : ViewModel() {
+//
+//    // LiveData holds state which is observed by the UI.
+//    // (state flows down from ViewModel)
+//    private val _name = MutableLiveData("")
+//    val name: LiveData<String> = _name
+//
+//    // onNameChanged is an event we're defining that the UI can invoke.
+//    // (events flow up from UI)
+//    fun onNameChanged(newName: String) {
+//        _name.value = newName
+//    }
+//}
+//
+//@JvmOverloads
+//@Composable
+//fun HelloScreen(helloViewModel: HelloViewModel = viewModel()) {
+//    // By default, viewModel() follows the Lifecycle as the Activity or Fragment
+//    // that calls HelloScreen().
+//
+//    // name is the _current_ value of [helloViewModel.name]
+//    // with an initial value of "".
+//    // observeAsState returns a State<T> that will trigger a recomposition
+//    // of the composables that read the state whenever it changes.
+//    val name: String by helloViewModel.name.observeAsState("")
+//
+//    Column {
+//        Text(text = "Hello, $name")
+//        TextField(
+//            value = name,
+//            onValueChange = { helloViewModel.onNameChanged(it) },
+//            label = { Text("Name") }
+//        )
+//    }
+//}
+
+
 
 @Composable
 fun Greeting(name: String) {
