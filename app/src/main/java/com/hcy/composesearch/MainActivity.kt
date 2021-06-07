@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.viewModels
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -13,11 +12,13 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.Divider
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
@@ -27,15 +28,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import com.hcy.composesearch.ui.theme.ComPoseSearchTheme
-import com.hcy.composesearch.ui.theme.MainViewMoudel
 
 
 /**
@@ -43,9 +40,7 @@ import com.hcy.composesearch.ui.theme.MainViewMoudel
  * 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
  */
 class MainActivity : ComponentActivity() {
-    private val acMoudel by lazy {
-        viewModels<MainViewMoudel>().value
-    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -53,16 +48,24 @@ class MainActivity : ComponentActivity() {
                 // A surface container using the 'background' color from the theme
                 Surface(color = MaterialTheme.colors.background) {
                     Column() {
+
+                        val rList = remember {
+                            mutableStateListOf<String>()
+                        }
                         addSearch(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .wrapContentHeight()
                         ) {
-                            Log.e("TAG", "DefaultPreview: do Search $it")
-                            addItem(it)
+                            if (rList.contains(it).not()) {
+                                rList.add(it)
+                            }
                         }
-
-                        
+                        LazyColumn() {
+                            items(rList) { item ->
+                                SearchhistoryItems(text = item)
+                            }
+                        }
                     }
                 }
             }
@@ -70,63 +73,38 @@ class MainActivity : ComponentActivity() {
     }
 
 
-    private fun addItem(it: String) {
 
-        acMoudel.addItem(it)
+}
 
+@Composable
+fun SearchhistoryItems(text: String, modifier: Modifier = Modifier) {
+    Column(
+        modifier
+            .fillMaxWidth()
+            .wrapContentHeight()
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .wrapContentHeight()
+                .padding(10.dp),
+            contentAlignment = Alignment.CenterStart
+        ) {
+            Text(
+                text = text,
+                color = Color(0xFFB6B6B6),
+                fontSize = 12.sp
+            )
+        }
+
+        Divider(color = Color(0xFFCCCCCC), modifier = Modifier.padding(5.dp, 0.dp))
     }
 }
+
+@Preview(showSystemUi = false, showBackground = true)
 @Composable
-fun  addItem( acMoudle:MainViewMoudel){
-//        val datas = acMoudle.lvDatas.observeAsState(arrayListOf())
-//        LazyColumn() {
-//            items(datas)
-//
-//        }
-}
-
-
-//class HelloViewModel : ViewModel() {
-//
-//    // LiveData holds state which is observed by the UI.
-//    // (state flows down from ViewModel)
-//    private val _name = MutableLiveData("")
-//    val name: LiveData<String> = _name
-//
-//    // onNameChanged is an event we're defining that the UI can invoke.
-//    // (events flow up from UI)
-//    fun onNameChanged(newName: String) {
-//        _name.value = newName
-//    }
-//}
-//
-//@JvmOverloads
-//@Composable
-//fun HelloScreen(helloViewModel: HelloViewModel = viewModel()) {
-//    // By default, viewModel() follows the Lifecycle as the Activity or Fragment
-//    // that calls HelloScreen().
-//
-//    // name is the _current_ value of [helloViewModel.name]
-//    // with an initial value of "".
-//    // observeAsState returns a State<T> that will trigger a recomposition
-//    // of the composables that read the state whenever it changes.
-//    val name: String by helloViewModel.name.observeAsState("")
-//
-//    Column {
-//        Text(text = "Hello, $name")
-//        TextField(
-//            value = name,
-//            onValueChange = { helloViewModel.onNameChanged(it) },
-//            label = { Text("Name") }
-//        )
-//    }
-//}
-
-
-
-@Composable
-fun Greeting(name: String) {
-    Text(text = "Hello $name!")
+fun showSearchHistoryItem() {
+    SearchhistoryItems(text = "123456")
 }
 
 @Composable
@@ -165,7 +143,9 @@ fun addSearch(modifier: Modifier = Modifier, doSearch: (serchKey: String) -> Uni
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .weight(1f),
+                            .weight(1f)
+                            .padding(10.dp,0.dp)
+                        ,
                     ) {
                         if (!clearVisiable) {
                             Text(text = "请输入", modifier = Modifier.wrapContentSize()
@@ -183,6 +163,12 @@ fun addSearch(modifier: Modifier = Modifier, doSearch: (serchKey: String) -> Uni
                                 text = it
                                 clearVisiable = it.isNotEmpty()
                             },
+                            keyboardActions = KeyboardActions(onSearch = {
+                                doSearch.invoke(text)
+                                text = ""
+                                clearVisiable = false
+                            })
+                            ,
                             textStyle = TextStyle(
                                 color = Color(0xFF353535),
                                 fontSize = 15.sp
@@ -216,6 +202,8 @@ fun addSearch(modifier: Modifier = Modifier, doSearch: (serchKey: String) -> Uni
             Box(modifier = Modifier
                 .clickable {
                     doSearch.invoke(text)
+                    text = ""
+                    clearVisiable = false
                 }
                 .width(44.dp)
                 .height(44.dp)
